@@ -1,13 +1,14 @@
-# calendar_tracker.py - Version 1
-# Basic calendar app - add and delete events
+# calendar_tracker.py - Version 2
+# Added recurring events support
 # Generated with AI assistance (Claude)
 
 events = []
 
-def add_event(date, title):
-    event = {"date": date, "title": title}
+def add_event(date, title, recurring=None):
+    event = {"date": date, "title": title, "recurring": recurring}
     events.append(event)
-    print(f"Event added: {title} on {date}")
+    recur_str = f" (repeats {recurring})" if recurring else ""
+    print(f"Event added: {title} on {date}{recur_str}")
 
 def delete_event(title):
     for event in events:
@@ -23,27 +24,38 @@ def list_events():
         return
     print("\nUpcoming Events:")
     for event in events:
-        print(f"  {event['date']} - {event['title']}")
+        recur = f" [{event['recurring']}]" if event.get("recurring") else ""
+        print(f"  {event['date']} - {event['title']}{recur}")
 
 def main():
-    print("Calendar Tracker v1")
-    print("-------------------")
+    print("Calendar Tracker v2 - Recurring Events")
+    print("---------------------------------------")
     while True:
         print("\n1. Add event")
-        print("2. Delete event")
-        print("3. List events")
-        print("4. Quit")
+        print("2. Add recurring event")
+        print("3. Delete event")
+        print("4. List events")
+        print("5. Quit")
         choice = input("Choose: ").strip()
         if choice == "1":
             date = input("Date (YYYY-MM-DD): ").strip()
             title = input("Event title: ").strip()
             add_event(date, title)
         elif choice == "2":
+            date = input("Start date (YYYY-MM-DD): ").strip()
+            title = input("Event title: ").strip()
+            print("Recurrence: daily / weekly / monthly")
+            recur = input("Choose: ").strip()
+            if recur not in ["daily", "weekly", "monthly"]:
+                print("Invalid recurrence, defaulting to weekly")
+                recur = "weekly"
+            add_event(date, title, recurring=recur)
+        elif choice == "3":
             title = input("Event title to delete: ").strip()
             delete_event(title)
-        elif choice == "3":
-            list_events()
         elif choice == "4":
+            list_events()
+        elif choice == "5":
             break
         else:
             print("Invalid choice.")
