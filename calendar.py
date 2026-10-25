@@ -1,12 +1,14 @@
-# calendar_tracker.py - Version 4
-# Added reminders - flags events happening today or tomorrow
+# calendar_tracker.py - Version 5
+# Added CSV export
 # Generated with AI assistance (Claude)
 
 import json
 import os
 import datetime
+import csv
 
 SAVE_FILE = "events.json"
+EXPORT_FILE = "events_export.csv"
 events = []
 
 def load_events():
@@ -21,6 +23,21 @@ def load_events():
 def save_events():
     with open(SAVE_FILE, "w") as f:
         json.dump(events, f, indent=2)
+
+def export_csv():
+    if not events:
+        print("No events to export.")
+        return
+    with open(EXPORT_FILE, "w", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=["date", "title", "recurring"])
+        writer.writeheader()
+        for event in events:
+            writer.writerow({
+                "date": event.get("date", ""),
+                "title": event.get("title", ""),
+                "recurring": event.get("recurring") or ""
+            })
+    print(f"Exported {len(events)} events to {EXPORT_FILE}")
 
 def check_reminders():
     today = datetime.date.today()
@@ -67,8 +84,8 @@ def list_events():
         print(f"  {event['date']} - {event['title']}{recur}")
 
 def main():
-    print("Calendar Tracker v4 - Reminders")
-    print("--------------------------------")
+    print("Calendar Tracker v5 - CSV Export")
+    print("---------------------------------")
     load_events()
     check_reminders()
     while True:
@@ -77,7 +94,8 @@ def main():
         print("3. Delete event")
         print("4. List events")
         print("5. Check reminders")
-        print("6. Quit")
+        print("6. Export to CSV")
+        print("7. Quit")
         choice = input("Choose: ").strip()
         if choice == "1":
             date = input("Date (YYYY-MM-DD): ").strip()
@@ -99,6 +117,8 @@ def main():
         elif choice == "5":
             check_reminders()
         elif choice == "6":
+            export_csv()
+        elif choice == "7":
             break
         else:
             print("Invalid choice.")
