@@ -1,9 +1,10 @@
-# calendar_tracker.py - Version 3
-# Added save/load events to JSON file
+# calendar_tracker.py - Version 4
+# Added reminders - flags events happening today or tomorrow
 # Generated with AI assistance (Claude)
 
 import json
 import os
+import datetime
 
 SAVE_FILE = "events.json"
 events = []
@@ -20,7 +21,25 @@ def load_events():
 def save_events():
     with open(SAVE_FILE, "w") as f:
         json.dump(events, f, indent=2)
-    print(f"Events saved to {SAVE_FILE}")
+
+def check_reminders():
+    today = datetime.date.today()
+    tomorrow = today + datetime.timedelta(days=1)
+    reminders = []
+    for event in events:
+        try:
+            event_date = datetime.date.fromisoformat(event["date"])
+            if event_date == today:
+                reminders.append(f"  TODAY: {event['title']}")
+            elif event_date == tomorrow:
+                reminders.append(f"  TOMORROW: {event['title']}")
+        except ValueError:
+            pass
+    if reminders:
+        print("\n*** REMINDERS ***")
+        for r in reminders:
+            print(r)
+        print("*****************")
 
 def add_event(date, title, recurring=None):
     event = {"date": date, "title": title, "recurring": recurring}
@@ -48,15 +67,17 @@ def list_events():
         print(f"  {event['date']} - {event['title']}{recur}")
 
 def main():
-    print("Calendar Tracker v3 - Persistent Storage")
-    print("-----------------------------------------")
+    print("Calendar Tracker v4 - Reminders")
+    print("--------------------------------")
     load_events()
+    check_reminders()
     while True:
         print("\n1. Add event")
         print("2. Add recurring event")
         print("3. Delete event")
         print("4. List events")
-        print("5. Quit")
+        print("5. Check reminders")
+        print("6. Quit")
         choice = input("Choose: ").strip()
         if choice == "1":
             date = input("Date (YYYY-MM-DD): ").strip()
@@ -68,7 +89,6 @@ def main():
             print("Recurrence: daily / weekly / monthly")
             recur = input("Choose: ").strip()
             if recur not in ["daily", "weekly", "monthly"]:
-                print("Invalid recurrence, defaulting to weekly")
                 recur = "weekly"
             add_event(date, title, recurring=recur)
         elif choice == "3":
@@ -77,6 +97,8 @@ def main():
         elif choice == "4":
             list_events()
         elif choice == "5":
+            check_reminders()
+        elif choice == "6":
             break
         else:
             print("Invalid choice.")
