@@ -1,6 +1,6 @@
 # calendar-tracker-ai
 
-AI-assisted calendar tracking application built for CSCI471.
+AI-assisted calendar tracking application.
 
 ## Versions
 
